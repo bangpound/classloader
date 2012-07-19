@@ -1,0 +1,6 @@
+name = Class Loader
+description = Enables Symfony's PSR-0-compatible UniversalClassLoader for namespaced PHP classes.
+core = 7.x
+php = 5.3.3
+; Load this module first.
+weight = -1000

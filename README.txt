@@ -24,4 +24,3 @@ To submit bug reports and feature suggestions, or to track changes:
 
 Current maintainers:
 * Daniel F. Kudwien (sun) - http://drupal.org/user/54136
-

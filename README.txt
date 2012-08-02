@@ -17,7 +17,8 @@ To submit bug reports and feature suggestions, or to track changes:
 
 -- INSTALLATION --
 
-* Install as usual, see http://drupal.org/node/70151 for further information.
+* You normally should not need to install this module, unless another module
+  depends on it.
 
 
 -- CONTACT --

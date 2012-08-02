@@ -40,6 +40,23 @@ function classloader_init() {
 }
 
 /**
+ * Implements hook_modules_installed().
+ */
+function classloader_modules_installed(array $modules) {
+  foreach ($modules as $module) {
+    $filename = drupal_get_filename('module', $module);
+    drupal_classloader_register($module, dirname($filename));
+  }
+}
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function classloader_modules_enabled(array $modules) {
+  classloader_modules_installed($modules);
+}
+
+/**
  * Initializes and returns the class loader.
  *
  * The class loader is responsible for lazy-loading all PSR-0 compatible

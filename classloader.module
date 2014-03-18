@@ -7,9 +7,6 @@
  * This code is a direct backport from Drupal 8.
  */
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
-use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
-
 /**
  * Implements hook_boot().
  */
@@ -74,56 +71,21 @@ function drupal_classloader() {
   static $loader;
 
   if (!isset($loader)) {
-    // Include the Symfony ClassLoader for loading PSR-0-compatible classes.
-//    require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php';
-    require_once dirname(__FILE__) . '/vendor/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php';
 
     // @todo Use a cleaner way than variable_get() to switch autoloaders.
     switch (variable_get('autoloader_mode', 'default')) {
       case 'apc':
         if (function_exists('apc_store')) {
-//          require_once DRUPAL_ROOT . '/core/vendor/symfony/class-loader/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
-          require_once dirname(__FILE__) . '/vendor/symfony/class-loader/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
-          $loader = new ApcUniversalClassLoader('drupal.' . $GLOBALS['drupal_hash_salt']);
+          $loader = new \Symfony\Component\ClassLoader\ApcUniversalClassLoader('drupal.' . $GLOBALS['drupal_hash_salt']);
           break;
         }
       // Fall through to the default loader if APC was not loaded, so that the
       // site does not fail completely.
       case 'dev':
       case 'default':
-      default:
-        $loader = new UniversalClassLoader();
+        $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
         break;
     }
-
-    // Register explicit PSR-0 vendor namespaces.
-    $loader->registerNamespaces(array(
-      // All Symfony-borrowed code lives in /core/vendor/symfony.
-      //'Symfony\Component\ClassLoader' => DRUPAL_ROOT . '/core/vendor/symfony/class-loader',
-      'Symfony\Component\ClassLoader' => dirname(__FILE__) . '/vendor/symfony/class-loader',
-//      'Symfony\Component\DependencyInjection' => DRUPAL_ROOT . '/core/vendor/symfony/dependency-injection',
-//      'Symfony\Component\EventDispatcher' => DRUPAL_ROOT . '/core/vendor/symfony/event-dispatcher',
-//      'Symfony\Component\HttpFoundation' => DRUPAL_ROOT . '/core/vendor/symfony/http-foundation',
-//      'Symfony\Component\HttpKernel' => DRUPAL_ROOT . '/core/vendor/symfony/http-kernel',
-//      'Symfony\Component\Routing' => DRUPAL_ROOT . '/core/vendor/symfony/routing',
-//      'Symfony\Component\Yaml' => DRUPAL_ROOT . '/core/vendor/symfony/yaml',
-//      'Doctrine\Common' => DRUPAL_ROOT . '/core/vendor/doctrine/common/lib',
-    ));
-    // Register PEAR-style vendor namespaces.
-//    $loader->registerPrefixes(array(
-//      // All Twig-borrowed code lives in /core/vendor/twig.
-//      'Twig' => DRUPAL_ROOT . '/core/vendor/twig/twig/lib',
-//    ));
-    // Register the Drupal namespace for classes in core as a fallback.
-    // This allows to register additional namespaces within the Drupal namespace
-    // (e.g., for modules) and avoids an additional file_exists() on the Drupal
-    // core namespace, since the class loader can already determine the best
-    // namespace match based on a string comparison. It further allows modules
-    // to register/overload namespaces in Drupal core.
-//    $loader->registerNamespaceFallbacks(array(
-//      // All Drupal-namespaced code in core lives in /core/lib/Drupal.
-//      'Drupal' => DRUPAL_ROOT . '/core/lib',
-//    ));
 
     // Register the loader with PHP.
     $loader->register();
@@ -143,4 +105,3 @@ function drupal_classloader_register($name, $path) {
   $loader = drupal_classloader();
   $loader->registerNamespace('Drupal\\' . $name, DRUPAL_ROOT . '/' . $path . '/lib');
 }
-
